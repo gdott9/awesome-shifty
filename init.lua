@@ -215,13 +215,13 @@ function shifty.set(t, args)
 
     -- attempt to load preset on initial run
     local preset = (awful.tag.getproperty(t, "initial") and
-    shifty.config.tags[t.name]) or {}
+            shifty.config.tags[t.name]) or {}
 
     -- pick screen and get its tag table
     local scr = args.screen or
-    (not t.screen and preset.screen) or
-    t.screen or
-    capi.mouse.screen
+            (not t.screen and preset.screen) or
+            t.screen or
+            capi.mouse.screen
 
     local clientstomove = nil
     if scr > capi.screen.count() then scr = capi.screen.count() end
@@ -342,7 +342,12 @@ function shifty.set(t, args)
     end
 
     -- set tag properties and push the new tag table
-    capi.screen[scr]:tags(tags)
+    for i, tag in pairs(tags) do tag.activated = false end
+    for i, tag in pairs(tags) do
+        tag.activated = true
+        awful.tag.setscreen(tag, scr)
+    end
+
     for prop, val in pairs(props) do awful.tag.setproperty(t, prop, val) end
 
     -- execute run/spawn
