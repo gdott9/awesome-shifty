@@ -97,7 +97,7 @@ end
 function shifty.rename(tag, prefix, no_selectall)
     local theme = beautiful.get()
     local t = tag or awful.tag.selected(capi.mouse.screen)
-    local scr = t.screen
+    local scr = awful.tag.getscreen(t)
     local bg = nil
     local fg = nil
     local text = prefix or t.name
@@ -219,15 +219,15 @@ function shifty.set(t, args)
 
     -- pick screen and get its tag table
     local scr = args.screen or
-            (not t.screen and preset.screen) or
-            t.screen or
+            (not awful.tag.getscreen(t) and preset.screen) or
+            awful.tag.getscreen(t) or
             capi.mouse.screen
 
     local clientstomove = nil
     if scr > capi.screen.count() then scr = capi.screen.count() end
-    if t.screen and scr ~= t.screen then
+    if awful.tag.getscreen(t) and scr ~= awful.tag.getscreen(t) then
         shifty.tagtoscr(scr, t)
-        t.screen = nil
+        awful.tag.setscreen(t, nil)
     end
     local tags = awful.tag.gettags(scr)
 
@@ -385,7 +385,7 @@ function shifty.add(args)
 
     -- unless forbidden or if first tag on the screen, show the tag
     if not (awful.tag.getproperty(t, "nopopup") or args.noswitch) or
-        #awful.tag.gettag(t.screen) == 1 then
+        #awful.tag.gettags(awful.tag.getscreen(t)) == 1 then
         awful.tag.viewonly(t)
     end
 
@@ -415,8 +415,8 @@ end
 --del : delete a tag
 --@param tag : the tag to be deleted [current tag]
 function shifty.del(tag)
-    local scr = (tag and tag.screen) or capi.mouse.screen or 1
-    local tags = awful.tag.gettag(scr)
+    local scr = (tag and awful.tag.getscreen(tag)) or capi.mouse.screen or 1
+    local tags = awful.tag.gettags(scr)
     local sel = awful.tag.selected(scr)
     local t = tag or sel
     local idx = shifty.tag2index(scr, t)
@@ -433,7 +433,7 @@ function shifty.del(tag)
     index_cache[scr][t.name] = idx
 
     -- remove tag
-    t.screen = nil
+    awful.tag.setscreen(t, nil)
 
     -- if the current tag is being deleted, restore from history
     if t == sel and #tags > 1 then
@@ -694,7 +694,7 @@ function shifty.match(c, startup)
     end
 
     -- set client's screen/tag if needed
-    target_screen = target_tags[1].screen or target_screen
+    target_screen = awful.tag.getscreen(target_tags[1]) or target_screen
     if c.screen ~= target_screen then c.screen = target_screen end
     if slave then awful.client.setslave(c) end
     c:tags(target_tags)
@@ -828,7 +828,7 @@ function shifty.getpos(pos, scr_arg)
         -- if there is no selected tag on current screen, look for the first one
         if not selected then
             for _, tag in pairs(existing) do
-                if tag.screen == scr then return tag end
+                if awful.tag.getscreen(tag) == scr then return tag end
             end
 
             -- no tag found, loop through the other tags
@@ -841,13 +841,13 @@ function shifty.getpos(pos, scr_arg)
             i = awful.util.cycle(#existing, i + 1)
             tag = existing[i]
 
-            if (scr_arg == nil or tag.screen == scr_arg) and not tag.selected then return tag end
+            if (scr_arg == nil or awful.tag.getscreen(tag) == scr_arg) and not tag.selected then return tag end
         until i == selected
 
         -- if the screen is not specified or
         -- if a selected tag exists on the specified screen
         -- return the selected tag
-        if scr_arg == nil or existing[selected].screen == scr then return existing[selected] end
+        if scr_arg == nil or awful.tag.getscreen(existing[selected]) == scr then return existing[selected] end
 
         -- if scr_arg ~= nil and no tag exists on this screen, continue
     end
