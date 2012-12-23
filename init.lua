@@ -66,7 +66,7 @@ function shifty.name2tags(name, scr)
     local ret = {}
     local a, b = scr or 1, scr or capi.screen.count()
     for s = a, b do
-        for i, t in ipairs(capi.screen[s]:tags()) do
+        for i, t in ipairs(awful.tag.gettags(s)) do
             if name == t.name then
                 table.insert(ret, t)
             end
@@ -85,7 +85,7 @@ end
 -- @param tag : the tag object to find
 -- @return the index [or zero] or end of the list
 function shifty.tag2index(scr, tag)
-    for i, t in ipairs(capi.screen[scr]:tags()) do
+    for i, t in ipairs(awful.tag.gettags(scr)) do
         if t == tag then return i end
     end
 end
@@ -139,7 +139,7 @@ function shifty.send(idx)
     local scr = capi.client.focus.screen or capi.mouse.screen
     local sel = awful.tag.selected(scr)
     local sel_idx = shifty.tag2index(scr, sel)
-    local tags = capi.screen[scr]:tags()
+    local tags = awful.tag.gettags(scr)
     local target = awful.util.cycle(#tags, sel_idx + idx)
     awful.client.movetotag(tags[target], capi.client.focus)
     awful.tag.viewonly(tags[target])
@@ -154,8 +154,8 @@ function shifty.send_prev() shifty.send(-1) end
 function shifty.pos2idx(pos, scr)
     local v = 1
     if pos and scr then
-        for i = #capi.screen[scr]:tags() , 1, -1 do
-            local t = capi.screen[scr]:tags()[i]
+        for i = #awful.tag.gettags(scr) , 1, -1 do
+            local t = awful.tag.gettags(scr)[i]
             if awful.tag.getproperty(t, "position") and
                 awful.tag.getproperty(t, "position") <= pos then
                 v = i + 1
@@ -229,7 +229,7 @@ function shifty.set(t, args)
         shifty.tagtoscr(scr, t)
         t.screen = nil
     end
-    local tags = capi.screen[scr]:tags()
+    local tags = awful.tag.gettags(scr)
 
     -- try to guess position from the name
     local guessed_position = nil
@@ -380,7 +380,7 @@ function shifty.add(args)
 
     -- unless forbidden or if first tag on the screen, show the tag
     if not (awful.tag.getproperty(t, "nopopup") or args.noswitch) or
-        #capi.screen[t.screen]:tags() == 1 then
+        #awful.tag.gettag(t.screen) == 1 then
         awful.tag.viewonly(t)
     end
 
@@ -411,7 +411,7 @@ end
 --@param tag : the tag to be deleted [current tag]
 function shifty.del(tag)
     local scr = (tag and tag.screen) or capi.mouse.screen or 1
-    local tags = capi.screen[scr]:tags()
+    local tags = awful.tag.gettag(scr)
     local sel = awful.tag.selected(scr)
     local t = tag or sel
     local idx = shifty.tag2index(scr, t)
@@ -758,7 +758,7 @@ end
 --deserted also handles deleting used and empty tags
 function shifty.sweep()
     for s = 1, capi.screen.count() do
-        for i, t in ipairs(capi.screen[s]:tags()) do
+        for i, t in ipairs(awful.tag.gettags(s)) do
             local clients = t:clients()
             local sticky = 0
             for i, c in ipairs(clients) do
@@ -809,7 +809,7 @@ function shifty.getpos(pos, scr_arg)
 
     -- search for existing tag assigned to pos
     for i = 1, capi.screen.count() do
-        for j, t in ipairs(capi.screen[i]:tags()) do
+        for j, t in ipairs(awful.tag.gettags(i)) do
             if awful.tag.getproperty(t, "position") == pos then
                 table.insert(existing, t)
                 if t.selected and i == scr then
@@ -953,7 +953,7 @@ function shifty.completion(cmd, cur_pos, ncomp, sources, matchers)
             for i = 1, capi.screen.count() do
                 local s = awful.util.cycle(capi.screen.count(),
                                             capi.mouse.screen + i - 1)
-                local tags = capi.screen[s]:tags()
+                local tags = awful.tag.gettags(s)
                 for j, t in pairs(tags) do
                     table.insert(ret, t.name)
                 end
