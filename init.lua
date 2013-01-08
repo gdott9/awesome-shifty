@@ -97,7 +97,11 @@ end
 function shifty.rename(tag, prefix, no_selectall)
     local theme = beautiful.get()
     local t = tag or awful.tag.selected(capi.mouse.screen)
+
+    if t == nil then return end
+
     local scr = awful.tag.getscreen(t)
+    local tag_index = shifty.tag2index(scr, t)
     local bg = nil
     local fg = nil
     local text = prefix or t.name
@@ -114,9 +118,9 @@ function shifty.rename(tag, prefix, no_selectall)
     awful.prompt.run({
         fg_cursor = fg, bg_cursor = bg, ul_cursor = "single",
         text = text, selectall = not no_selectall},
-        shifty.taglist[scr][shifty.tag2index(scr, t) * 2],
+        shifty.taglist[scr].widgets[tag_index].widget.widgets[2].widget,
         function (name) if name:len() > 0 then t.name = name; end end,
-        completion,
+        shifty.completion,
         awful.util.getdir("cache") .. "/history_tags",
         nil,
         function ()
