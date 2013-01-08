@@ -335,13 +335,13 @@ globalkeys = awful.util.table.join(
               "n",
               function()
                   local t = awful.tag.selected()
-                  local s = awful.util.cycle(screen.count(), t.screen + 1)
+                  local s = awful.util.cycle(screen.count(), awful.tag.getscreen(t) + 1)
                   awful.tag.history.restore()
                   t = shifty.tagtoscr(s, t)
                   awful.tag.viewonly(t)
               end),
     awful.key({modkey}, "a", shifty.add), -- creat a new tag
-    awful.key({modkey,}, "r", shifty.rename), -- rename a tag
+    awful.key({modkey, "Shift"}, "r", shifty.rename), -- rename a tag
     awful.key({modkey, "Shift"}, "a", -- nopopup new tag
     function()
         shifty.add({nopopup = true})
@@ -387,7 +387,7 @@ globalkeys = awful.util.table.join(
     awful.key({ modkey,           }, "space", function () awful.layout.inc(layouts,  1) end),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(layouts, -1) end),
 
-    awful.key({ modkey, "Control" }, "n", awful.client.restore),
+    awful.key({ modkey, "Control" }, "m", awful.client.restore),
 
     -- Prompt
     awful.key({ modkey },            "r",     function () mypromptbox[mouse.screen]:run() end),
@@ -410,7 +410,7 @@ clientkeys = awful.util.table.join(
     awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end),
     awful.key({ modkey,           }, "o",      awful.client.movetoscreen                        ),
     awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end),
-    awful.key({ modkey,           }, "n",
+    awful.key({ modkey, "Shift"   }, "m",
         function (c)
             -- The client currently has the input focus, so it cannot be
             -- minimized, since minimized clients can't have the focus.
