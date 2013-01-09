@@ -192,7 +192,7 @@ function shifty.tagtoscr(scr, t)
     -- tag to move
     local otag = t or awful.tag.selected()
 
-    otag.screen = scr
+    awful.tag.setscreen(otag, scr)
     -- set screen and then reset tag to order properly
     if #otag:clients() > 0 then
         for _ , c in ipairs(otag:clients()) do
@@ -380,10 +380,8 @@ function shifty.add(args)
     local name = args.name or " "
 
     -- initialize a new tag object and its data structure
-    local t = capi.tag{name = name}
+    local t = awful.tag.add(name, { initial = true })
 
-    -- tell shifty.set() that this is the first time
-    awful.tag.setproperty(t, "initial", true)
 
     -- apply tag settings
     shifty.set(t, args)
