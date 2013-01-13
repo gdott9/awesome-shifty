@@ -180,12 +180,12 @@ function shifty.select(args)
     end
 end
 
---tagtoscr : move an entire tag to another screen
+--tag2scr : move an entire tag to another screen
 --
 --@param scr : the screen to move tag to
 --@param t : the tag to be moved [awful.tag.selected()]
 --@return the tag
-function shifty.tagtoscr(scr, t)
+function shifty.tag2scr(scr, t)
     -- break if called with an invalid screen number
     if not scr or scr < 1 or scr > capi.screen.count() then return end
     -- tag to move
@@ -230,7 +230,7 @@ function shifty.set(t, args)
     local clientstomove = nil
     if scr > capi.screen.count() then scr = capi.screen.count() end
     if awful.tag.getscreen(t) and scr ~= awful.tag.getscreen(t) then
-        shifty.tagtoscr(scr, t)
+        shifty.tag2scr(scr, t)
         awful.tag.setscreen(t, nil)
     end
     local tags = awful.tag.gettags(scr)
