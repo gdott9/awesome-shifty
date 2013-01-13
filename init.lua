@@ -97,7 +97,7 @@ function shifty.rename(tag, prefix, no_selectall)
     local theme = beautiful.get()
     local t = tag or awful.tag.selected(capi.mouse.screen)
 
-    if t == nil then return end
+    if not t then return end
 
     local scr = awful.tag.getscreen(t)
     local tag_index = shifty.tag2index(scr, t)
@@ -157,8 +157,9 @@ function shifty.send_prev() shifty.send(-1) end
 function shifty.pos2idx(pos, scr)
     local v = 1
     if pos and scr then
-        for i = #awful.tag.gettags(scr) , 1, -1 do
-            local t = awful.tag.gettags(scr)[i]
+        local tags = awful.tag.gettags(scr)
+        for i = #tags, 1, -1 do
+            local t = tags[i]
             if awful.tag.getproperty(t, "position") and
                 awful.tag.getproperty(t, "position") <= pos then
                 v = i + 1
@@ -1027,7 +1028,7 @@ function shifty.tagkeys(s)
     local sel = awful.tag.selected(s.index)
     local keys = awful.tag.getproperty(sel, "keys") or
                     shifty.config.globalkeys
-    if keys and sel.selected then capi.root.keys(keys) end
+    if keys and sel ~= nil and sel.selected then capi.root.keys(keys) end
 end
 
 -- squash_keys: helper function which removes duplicate
