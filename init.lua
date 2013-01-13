@@ -130,7 +130,6 @@ function shifty.rename(tag, prefix, no_selectall)
                 shifty.set(t)
             end
             shifty.tagkeys(capi.screen[scr])
-            t.selected = true
             t:emit_signal("property::name")
         end
         )
@@ -345,9 +344,14 @@ function shifty.set(t, args)
     end
 
     -- set tag properties and push the new tag table
+    local selectedlist = awful.tag.selectedlist(scr)
     for i, tag in pairs(tags) do tag.activated = false end
     for i, tag in pairs(tags) do
         tag.activated = true
+        -- restore previously selected tags
+        if awful.util.table.hasitem(selectedlist, tag) then
+            tag.selected = true
+        end
         awful.tag.setscreen(tag, scr)
     end
 
@@ -379,7 +383,6 @@ function shifty.add(args)
 
     -- initialize a new tag object and its data structure
     local t = awful.tag.add(name, { initial = true })
-
 
     -- apply tag settings
     shifty.set(t, args)
