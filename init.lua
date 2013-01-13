@@ -674,10 +674,10 @@ function shifty.match(c, startup)
         -- missing ones
         for i, tn in ipairs(target_tag_names) do
             local res = {}
-            for j, t in ipairs(name2tags(tn, target_screen) or
+            for j, t in ipairs(shifty.name2tags(tn, target_screen) or
                 shifty.name2tags(tn) or {}) do
                 local mc = awful.tag.getproperty(t, "max_clients")
-                local tagged = is_client_tagged(t, c)
+                local tagged = shifty.is_client_tagged(t, c)
                 if intrusive or
                     not (mc and (((#t:clients() >= mc) and not
                     tagged) or
